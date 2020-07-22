@@ -1,0 +1,32 @@
+
+results_df = data.frame(f=f_vec[-1],
+                        time=cc_results[[1]]$results$time,
+                        cc=rep(cc_vec[1],length(f_vec)-1))
+
+for( i in 2:length(cc_vec) )
+{
+  temp = data.frame(f=f_vec[-1],
+                    time=cc_results[[i]]$results$time,
+                    cc=rep(cc_vec[i],length(f_vec)-1))
+  results_df = rbind(results_df, temp)
+}
+
+results_df %>%
+  ggplot(aes(x=f, y=time-t_relax)) +
+  geom_point(alpha=0.5, size=0.75) +
+  scale_x_reverse() +
+  labs(x='Relaxed social distancing forcing',
+       y='Days since relaxation',
+       title='Effect of strength of relaxed social distancing on timing',
+       subtitle=paste('Current forcing',pars$f,'changed at',relax_date))
+
+results_df %>%
+  filter(cc%%5==0) %>%
+  ggplot(aes(x=f,y=time-t_relax)) +
+  geom_line(aes(color=as.factor(cc))) +
+  scale_x_reverse() +
+  scale_color_discrete(name='cc') +
+  labs(x='Relaxed social distancing forcing',
+       y='Days since relaxation',
+       title='Effect of strength of relaxed social distancing on timing',
+       subtitle=paste('Current forcing',pars$f,'changed at',relax_date))

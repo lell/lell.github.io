@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="us">
+<head>
+	<meta charset="utf-8">
+<meta property="og:title" content="Elliott Lab">
+<meta property="og:description" content="Machine learning with beauty and care.">
+<meta property="og:image" content="http://www.elliottlab.ca/out4.png">
+<meta property="og:image:secure_url" content="https://www.elliottlab.ca/out4.png">
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="250" />
+<meta property="og:image:height" content="273" />
+<meta property="og:url" content="https://www.elliottlab.ca/">
+
+
+	<title>elliottlab.ca</title>
+	<link href="jquery-ui.css" rel="stylesheet">
+	<script src="external/jquery/jquery.js"></script>
+	<script src="jquery-ui.js"></script>
+<!--script src="polyfill.min.js?features=es6"></script-->
+<script id="MathJax-script" async src="MathJax/es5/tex-mml-chtml.js"></script>
+
+	<style>
+	body {
+		font-family: "Trebuchet MS", sans-serif;
+		background-color: #222222; 
+		color: #e0dee2;
+		margin: 0px;
+		border: 0px;
+		padding: 0px;
+	}
+
+	div.toc {
+		padding-top: 25px;
+		padding-bottom: 0px;
+		padding-left: 5px;
+	}
+
+	html { overflow-y: scroll; }
+
+	div.main1 {
+		background-color: #3d3639;
+		margin-top: 0px;
+		margin-bottom: 0px;
+		margin-left: 0px;
+		margin-right: 0px;
+		padding-left: 0px;
+		padding-right: 0px;
+		padding-top: 0px;
+		padding-bottom: 25px;
+		border: 0px;
+	}
+
+	div.main2 {
+		margin-top: 0px;
+		margin-bottom: 0px;
+		margin-left: 50px;
+		margin-right: 50px;
+		padding-top: 0px;
+		padding-left: 0px;
+		padding-right: 0px;
+		padding-bottom: 5px;
+		border: 0px;
+	}
+
+
+	div.middle1 {
+		background-color: #3d3639;
+		margin-top: 0px;
+		margin-bottom: 0px;
+		margin-left: 0px;
+		margin-right: 0px;
+		padding-left: 0px;
+		padding-right: 0px;
+		padding-top: 0px;
+		padding-bottom: 0px;
+		border: 0px;
+	}
+
+	span.middle2 {
+		margin-top: 0px;
+		margin-bottom: 0px;
+		margin-left: 50px;
+		margin-right: 50px;
+		padding-top: 0px;
+		padding-left: 0px;
+		padding-right: 0px;
+		padding-bottom: 0px;
+		border: 0px;
+	}
+
+	div.middle2 {
+		margin-top: 0px;
+		margin-bottom: 0px;
+		margin-left: 50px;
+		margin-right: 50px;
+		padding-top: 0px;
+		padding-left: 0px;
+		padding-right: 0px;
+		padding-bottom: 0px;
+		border: 0px;
+	}
+
+	li {
+		list-style-position: inside;
+text-indent: -1em;
+margin-bottom: 20px;
+	}
+
+	div.top {
+		margin-top: 0px;
+		margin-left: 50px;
+		margin-right: 50px;
+		margin-bottom: 0px;
+	}
+
+
+    u {
+        text-decoration: underline;
+        -webkit-text-decoration-color: #9f9f9f;
+        text-decoration-color: #9f9f9f;
+    }
+
+	h2 {
+		padding-top: 20px;
+	}
+
+	hr {
+    border: none;
+    height: 5px;
+    color: #58525e; /* 58525e old IE e0dee2 706f71*/
+    background-color: #58525e; /* Modern Browsers */
+}
+}
+
+	.demoHeaders {
+		margin-top: 2em;
+	}
+	#dialog-link {
+		padding: .4em 1em .4em 20px;
+		text-decoration: none;
+		position: relative;
+	}
+	#dialog-link span.ui-icon {
+		margin: 0 5px 0 0;
+		position: absolute;
+		left: .2em;
+		top: 50%;
+		margin-top: -8px;
+	}
+	#icons {
+		margin: 0;
+		padding: 0;
+	}
+	#icons li {
+		margin: 2px;
+		position: relative;
+		padding: 4px 0;
+		cursor: pointer;
+		float: left;
+		list-style: none;
+	}
+	#icons span.ui-icon {
+		float: left;
+		margin: 0 4px;
+	}
+	.fakewindowcontain .ui-widget-overlay {
+		position: absolute;
+	}
+	select {
+		width: 200px;
+	}
+
+	li {
+
+		line-height: 1.5;
+	}
+	p.content {
+		line-height: 1.5;
+		padding-bottom: 5px;
+	}
+
+	div.content {
+
+		  display: flex;
+  flex-flow: column;
+  height: 100%;
+	}
+
+
+span.title {
+	color: #bbb4c2; /*#ae90ff; /*#f92472; /* f92472 c3245e 259e00 */
+	font-weight: bold;
+}
+
+span.option {
+	color: #bbb4c2; /*#54d992; /*#67d8ef; /* a6e22c 26816e 259e00   9689a4 */
+	font-weight: bold;
+}
+
+span.command {
+	color: #bbb4c2; /*#67d8ef; /* ac80ff #71266e; */
+	font-weight: bold;
+}
+	ol.content {
+		line-height: 1.25;
+	}
+
+	ul.content {
+		line-height: 1.25;
+		padding-bottom: 5px;
+	}
+
+  .math {font-size: 67%; color: #888888;}
+
+div.manual1 {
+	background-color: #292328; #58525e; /*#e0dee2;*/
+	color: #9689a4;
+	/*color: #000000;*/
+height: 100%;
+	padding: 0px;
+	border: 0px;
+	margin: 0px;
+	float:left;
+	overflow:auto; 
+}
+
+@font-face {
+    font-family: 'DroidSansMono';
+    src: url('DroidSansMono.ttf');
+}
+
+div.manual2 {
+	font-family: DroidSansMono;
+	margin: 50px;
+	height: 100%;
+	float:left;
+		line-height: 2;
+	overflow:auto; 
+}
+
+a:link {
+  text-decoration: none;
+  color: #9689a4;
+}
+
+a:visited {
+  text-decoration: none;
+  color: #9689a4;
+}
+
+a:hover {
+  text-decoration: none;
+  color: #bbb4c2;
+}
+
+
+a:active {
+  text-decoration: none;
+  color: #bbb4c2;
+}
+
+div.header {
+	width: 100%;
+	margin-left: 0px;
+	margin-right: 0px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	padding: 0px;
+	border: 0px;
+	top: 0px;
+	left: 0px;
+	background-color: #58525e;
+}
+
+
+div.footer {
+	width: 100%;
+	margin-left: 0px;
+	margin-right: 0px;
+	margin-top: 5px;
+	margin-bottom: 0px;
+	padding: 0px;
+	border: 0px;
+	left: 0px;
+	background-color: #3d3639;
+}
+
+
+
+
+	div.bottom {
+		margin-top: 0px;
+		margin-left: 50px;
+		margin-right: 50px;
+		margin-bottom: 0px;
+	}
+
+
+
+	</style>
+</head>
+<body>
+	<div style="background-color: black; width:100%; height:30px; float:left;">
+	<a href="https://www.sfu.ca/"><img src="black.png" style="float:left; width:60px; margin-right:20px; border:0px;"></a>
+</div>
+	<div style="background-color: #58525e;">
+<div class="header">
+	<big><center>
+	<div style="line-height: 2.0; padding-top:15px; padding-left:15px; padding-right: 15px;">
+	<a href="index.html">Home</a> &nbsp;&nbsp;
+	People &nbsp;&nbsp;
+	<a href="papers.html">Papers</a> &nbsp;&nbsp;
+	<a href="software.html">Software</a> &nbsp;&nbsp;
+	<a href="data.html">Data</a> &nbsp;&nbsp;
+	<a href="jc.html">JC</a> &nbsp;&nbsp;
+	<a href="events.html">Events</a> &nbsp;&nbsp;
+	<a href="teaching.html">Teaching</a>
+</div>
+</center></big>
+<span>&nbsp;
+	<div class="top">
+<h1><i>elliottlab</i></h1>
+</div>&nbsp;
+</span>
+</div> 
+<div>
+<div style="right:0px; top:98px; position: absolute;">
+<div style="margin: 0px; border-left: 0px; position: static; right: 0px; border-right: 0px; border-bottom: 0px; border-style: solid; border-color: #58525e;">
+	<table><tr><td>
+	<div style="position:relative; top:10px; margin-top:25px; margin-left:20px;">
+	 <i><big>Machine learning with beauty and care.</big></i>
+	</div></td><td>
+	<img style="top:4px; left: -5px; position: relative;" src="out4.png" width=250 height=273></td></tr></table>
+</div></div>
+</div>
+<div class="middle1">
+<span class="middle2">
+<div class="middle2" style="margin-top:30px;">
+	<div class="toc">
+
+</div>
+
+<h2><a id="introduction"></a>People</h2>
+<div class="content">
+<p class="content" ><img src="profile.png" height="150" style="float: right; filter: brightness(65%); margin: 25px 25px 25px 25px; border:10px; border-color: #9689a4; box-shadow: inset 25px 25px 25px #9689a4; padding: 4px" alt="portrait"/><b>Dr. Lloyd T. Elliott</b> is an Assistant Professor of Big Data in the Department of Statistics and Actuarial Science at Simon Fraser University, and an Honorary Academic Visitor at the Nuffield Department of Clinical Neuroscience at the University of Oxford. Dr. Elliott was trained by the Gatsby Unit at University College London, where he did his PhD thesis on Bayesian nonparametric models for genetic variation under the supervision of Prof. Yee Whye Teh. After his PhD, Dr. Elliott did postdoctoral research on the statistical genetics floor of the Department of Statistics at Oxford, and was a Research Member of the Common Room at Kellogg College. Contact by email at <span style="font-family:'Lucida Console', monospace">lloyd &#x1427; elliott &#x1612; sfu &#x1427; ca</span> or by phone at <i>&#43;&#8203;1&#65288;604&#8203;&#8203;&#65289;442&#8203;&#8203;&#8203;&#8203;&#8203;  4783</i><span style="font-family:'Lucida Console', monospace"></span> or by post at <i>Department of Statistics and Actuarial Science, Simon Fraser University, 8888 University Dr., Burnaby, B.C., Canada, V5A 1S6</i>.
+</p>
+<br>
+<p class="content" ><img src="shufei.png" height="150" style="float: right; filter: brightness(85%); margin: 5px 25px 25px 25px; border:10px; border-color: #9689a4; box-shadow: inset 25px 25px 25px #9689a4; padding: 4px" alt="portrait"/>
+<b>Shufei Ge</b> is a fourth year PhD student at SFU, jointly supervised by Dr. Liangliang Wang and Dr. Lloyd Elliott. She works on Monte Carlo methods, Bayesian nonparametrics, imaging neuroscience, and genetics. Shufei did her undergraduate at Central South University and her master at Wuhan University.
+</p>
+
+
+
+
+<br>
+<p class="content" ><img src="Sonny_pic.jpeg" height="150" style="float: right; filter: brightness(85%); margin: 5px 25px 25px 25px; border:10px; border-color: #9689a4; box-shadow: inset 25px 25px 25px #9689a4; padding: 4px" alt="portrait"/>
+<b>Sonny Min</b> Sonny Min is a second-year Master&rsquo;s student in Statistics at Simon Fraser University, supervised by Dr. Lloyd Elliott. His research interests include reinforcement learning/deep learning efficiency enhancements and their applications. Sonny graduated with a Bachelor of Economics in Statistics at Sungkyunkwan University in Seoul, South Korea.
+</p>
+<br>
+<b>Zubia Mansoor.</b>
+<!--p class="content" ><img src="zubia.png" height="150" style="float: right; filter: brightness(85%); margin: 25px 25px 25px 25px; border:10px; border-color: #9689a4; box-shadow: inset 25px 25px 25px #9689a4; padding: 4px" alt="portrait"/>
+</p-->
+<br>
+<p class="content" ><!--img src="hannah.png" height="150" style="float: right; filter: brightness(85%); margin: 5px 25px 25px 25px; border:10px; border-color: #9689a4; box-shadow: inset 25px 25px 25px #9689a4; padding: 4px" alt="portrait"/-->
+<b>Hannah Sutton</b>. I graduated from SFU with an honours BSc where I majored in applied mathematics. My research followed on from a USRA in the summer of 2017 where I was supervised by Dr. Nilima Nigam. The title of my undergrad thesis was &lsquo;An Eigenvalue Problem in Linear Elasticity&rsquo;. Specifically, I focused on applying numerical methods to solve an eigenvalue PDE problem with boundary conditions. My overall goal was to prove the existence of a solution to the problem (otherwise known as Jones Modes) for various 2D shapes.
+I am currently completing my Msc at SFU with my senior supervisor Dr. Caroline Colijn and co-supervisor Dr. Lloyd Elliott. My research and thesis is focused on &lsquo;Quantification of Uncertainty in Random Forests&rsquo;. In my spare time I enjoy spending time with my cat, and playing Ultimate.
+</p>
+<br><br><b>Winfield Chen.</b> <!-- d Dr. Lloyd Elliott. She works on Monte Carlo methods,        Bayesian nonparametrics, imaging neuroscience, andd Dr. Lloyd Elliott. She works on Monte Carlo methods,        Bayesian nonparametrics, imaging neuroscience, andd Dr. Lloyd Elliott. She works on Monte Carlo methods,        Bayesian nonparametrics, imaging neuroscience, andd Dr. Lloyd Elliott. She works on Monte Carlo methods,        Bayesian nonparametrics, imaging neuroscience, andd Dr. Lloyd Elliott. She works on Monte Carlo methods,        Bayesian nonparametrics, imaging neuroscience, andd Dr. Lloyd Elliott. She works on Monte Carlo methods,        Bayesian nonparametrics, imaging neuroscience, andd Dr. Lloyd Elliott. She works on Monte Carlo methods,        Bayesian nonparametrics, imaging neuroscience, andd Dr. Lloyd Elliott. She works on Monte Carlo methods,        Bayesian nonparametrics, imaging neuroscience, and.
+<p class="content" ><img src="winfield.png" height="150" style="float: right;  filter: brightness(85%); margin: 25px 25px 25px 25px; border:10px; border-color: #9689a4; box-shadow: inset 25px 25px 25px #9689a4; padding: 4px" alt="portrait"/>
+</p> -->
+<br>
+<br>
+<p class="content" ><img src="wendy.png" height="150" style="float: right; filter: brightness(85%); margin: 25px 25px 25px 25px; border:10px; border-color: #9689a4; box-shadow: inset 25px 25px 25px #9689a4; padding: 4px" alt="portrait"/>
+<b>Wen Tian (Wendy) Wang</b> is an undergraduate student majoring in Statistics and is going to pursue her MSc. Statistics degree supervised by Dr. Boxin Tang in Fall 2020. Her current project under the supervision of Dr. Lloyd T. Elliott focuses on developing a new technique for visualizing the validity of axis-align and relax-axis-align tree-based methods (e.g. decision trees, random tessellation process), which allows researchers to intuitively examine the quality of each tree cut. She is interested in machine learning, enthusiastic in coding, passionate about any topics related to statistical analysis and computing, and enjoying studying in an environment with background noise and jazz music.
+</p>
+
+
+<p class="content" ><b>Muratzhan Kyranbay</b> is a third-year undergraduate student at Hong Kong Baptist University and currently at the University of Southern Denmark in his exchange semester. He is working on a Bachelor&rsquo;s degree in Mathematics and Statistics. Muratzhan is currently studying nonparametric statistics under the guidance of Dr. Lloyd Elliott. He also works on polygonal numbers and in particular representation of natural numbers as a sum of polygonal numbers.</p>
+</br>
+
+</div>
+
+<h2><a id="introduction"></a>Alumni</h2>
+<br>
+<div class="content" >
+<p class="content" ><img src="shijia.png" height="150" style="float: right; filter: brightness(85%); margin: 5px 25px 25px 25px; border:10px; border-color: #9689a4; box-shadow: inset 25px 25px 25px #9689a4; padding: 4px" alt="portrait"/>
+<b>Dr. Shijia Wang</b> did his PhD at SFU under supervision of Dr. Liangliang and Dr. Lloyd Elliott. His research interest involves Bayesian Monte Carlo, machine learning and bioinformatics. Shijia is recipients of the C. D. Nelson Memorial Graduate Entrance Scholarship, Provost Prize of Distinction and Randy Sitter Annual Graduate Scholarship. He is now a tenure-track assistant professor in School of Statistics and Data Science, Nankai University.
+</p>
+<br>
+<p class="content" ><img src="alice.png" height="150" style="float: right; filter: brightness(85%); margin: 25px 25px 25px 25px; border:10px; border-color: #9689a4; box-shadow: inset 25px 25px 25px #9689a4; padding: 4px" alt="portrait"/>
+<b>Alice Roberts</b> is currently a Security Data Analyst for FIFA at Electronic Arts. She is an alumni of Simon Fraser University where she graduated with a Bachelors of Science in Applied Mathematics &amp; Statistics. She is also the founder and co-organizer of B.C.&rsquo;s first Undergraduate Mathematics &amp; Statistics Conference. Alice will continue her studies as a Master&rsquo;s student in Statistics at Simon Fraser University in Fall 2020. Her research interests are stochastic processes, in particular rough volatility and data science/machine learning. Her hobbies include: volleyball, dancing, and travelling. 
+</p>
+</div>
+
+</div>
+</div>
+<div class="footer" >
+<span>&nbsp;
+	<div class="bottom" style="bottom:0px; position:relative;">
+<i>Simon Fraser University acknowledges the Coast Salish People on whose traditional and unceded territories we are privileged to live, work and play.</i>
+</div>&nbsp;
+</span>
+</div>
+
+<!--div class="bottom">
+	<span>
+<p class="footer"><small>
+Copyright 2020, Winfield Chen and Lloyd T. Elliott
+</small></p>
+</span>
+</div-->
+<script>
+$( "#button" ).button();
+$( "#button-icon" ).button({
+	icon: "ui-icon-gear",
+	showLabel: false
+});
+
+$( "#radioset" ).buttonset();
+
+$( "#controlgroup" ).controlgroup();
+
+$( "#dialog-link, #icons li" ).hover(
+	function() {
+		$( this ).addClass( "ui-state-hover" );
+	},
+	function() {
+		$( this ).removeClass( "ui-state-hover" );
+	}
+);
+</script>
+</span>
+</div>
+</body>
+</html>

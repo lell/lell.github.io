@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="us">
+<head>
+	<meta charset="utf-8">
+<meta property="og:title" content="Elliott Lab">
+<meta property="og:description" content="Machine learning with beauty and care.">
+<meta property="og:image" content="http://www.elliottlab.ca/out4.png">
+<meta property="og:image:secure_url" content="https://www.elliottlab.ca/out4.png">
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="250" />
+<meta property="og:image:height" content="273" />
+<meta property="og:url" content="https://www.elliottlab.ca/">
+
+	<title>elliottlab.ca</title>
+	<link href="jquery-ui.css" rel="stylesheet">
+	<script src="external/jquery/jquery.js"></script>
+	<script src="jquery-ui.js"></script>
+<!--script src="polyfill.min.js?features=es6"></script-->
+<script id="MathJax-script" async src="MathJax/es5/tex-mml-chtml.js"></script>
+
+	<style>
+	body {
+		font-family: "Trebuchet MS", sans-serif;
+		background-color: #222222; 
+		color: #e0dee2;
+		margin: 0px;
+		border: 0px;
+		padding: 0px;
+	}
+
+	div.toc {
+		padding-top: 25px;
+		padding-bottom: 0px;
+		padding-left: 5px;
+	}
+
+	html { overflow-y: scroll; }
+
+	div.main1 {
+		background-color: #3d3639;
+		margin-top: 0px;
+		margin-bottom: 0px;
+		margin-left: 0px;
+		margin-right: 0px;
+		padding-left: 0px;
+		padding-right: 0px;
+		padding-top: 0px;
+		padding-bottom: 25px;
+		border: 0px;
+	}
+
+	div.main2 {
+		margin-top: 0px;
+		margin-bottom: 0px;
+		margin-left: 50px;
+		margin-right: 50px;
+		padding-top: 0px;
+		padding-left: 0px;
+		padding-right: 0px;
+		padding-bottom: 5px;
+		border: 0px;
+	}
+
+
+	div.middle1 {
+		background-color: #3d3639;
+		margin-top: 0px;
+		margin-bottom: 0px;
+		margin-left: 0px;
+		margin-right: 0px;
+		padding-left: 0px;
+		padding-right: 0px;
+		padding-top: 0px;
+		padding-bottom: 0px;
+		border: 0px;
+	}
+
+	span.middle2 {
+		margin-top: 0px;
+		margin-bottom: 0px;
+		margin-left: 50px;
+		margin-right: 50px;
+		padding-top: 0px;
+		padding-left: 0px;
+		padding-right: 0px;
+		padding-bottom: 0px;
+		border: 0px;
+	}
+
+	div.middle2 {
+		margin-top: 0px;
+		margin-bottom: 0px;
+		margin-left: 50px;
+		margin-right: 50px;
+		padding-top: 0px;
+		padding-left: 0px;
+		padding-right: 0px;
+		padding-bottom: 0px;
+		border: 0px;
+	}
+
+	li {
+		list-style-position: inside;
+text-indent: -1em;
+margin-bottom: 20px;
+	}
+
+	div.top {
+		margin-top: 0px;
+		margin-left: 50px;
+		margin-right: 50px;
+		margin-bottom: 0px;
+	}
+
+
+    u {
+        text-decoration: underline;
+        -webkit-text-decoration-color: #9f9f9f;
+        text-decoration-color: #9f9f9f;
+    }
+
+	h2 {
+		padding-top: 20px;
+	}
+
+	hr {
+    border: none;
+    height: 5px;
+    color: #58525e; /* 58525e old IE e0dee2 706f71*/
+    background-color: #58525e; /* Modern Browsers */
+}
+}
+
+	.demoHeaders {
+		margin-top: 2em;
+	}
+	#dialog-link {
+		padding: .4em 1em .4em 20px;
+		text-decoration: none;
+		position: relative;
+	}
+	#dialog-link span.ui-icon {
+		margin: 0 5px 0 0;
+		position: absolute;
+		left: .2em;
+		top: 50%;
+		margin-top: -8px;
+	}
+	#icons {
+		margin: 0;
+		padding: 0;
+	}
+	#icons li {
+		margin: 2px;
+		position: relative;
+		padding: 4px 0;
+		cursor: pointer;
+		float: left;
+		list-style: none;
+	}
+	#icons span.ui-icon {
+		float: left;
+		margin: 0 4px;
+	}
+	.fakewindowcontain .ui-widget-overlay {
+		position: absolute;
+	}
+	select {
+		width: 200px;
+	}
+
+	li {
+
+		line-height: 1.5;
+	}
+	p.content {
+		line-height: 1.5;
+		padding-bottom: 5px;
+	}
+
+	div.content {
+
+		  display: flex;
+  flex-flow: column;
+  height: 100%;
+	}
+
+
+span.title {
+	color: #bbb4c2; /*#ae90ff; /*#f92472; /* f92472 c3245e 259e00 */
+	font-weight: bold;
+}
+
+span.option {
+	color: #bbb4c2; /*#54d992; /*#67d8ef; /* a6e22c 26816e 259e00   9689a4 */
+	font-weight: bold;
+}
+
+span.command {
+	color: #bbb4c2; /*#67d8ef; /* ac80ff #71266e; */
+	font-weight: bold;
+}
+	ol.content {
+		line-height: 1.25;
+	}
+
+	ul.content {
+		line-height: 1.25;
+		padding-bottom: 5px;
+	}
+
+  .math {font-size: 67%; color: #888888;}
+
+div.manual1 {
+	background-color: #292328; #58525e; /*#e0dee2;*/
+	color: #9689a4;
+	/*color: #000000;*/
+height: 100%;
+	padding: 0px;
+	border: 0px;
+	margin: 0px;
+	float:left;
+	overflow:auto; 
+}
+
+@font-face {
+    font-family: 'DroidSansMono';
+    src: url('DroidSansMono.ttf');
+}
+
+div.manual2 {
+	font-family: DroidSansMono;
+	margin: 50px;
+	height: 100%;
+	float:left;
+		line-height: 2;
+	overflow:auto; 
+}
+
+a:link {
+  text-decoration: none;
+  color: #9689a4;
+}
+
+a:visited {
+  text-decoration: none;
+  color: #9689a4;
+}
+
+a:hover {
+  text-decoration: none;
+  color: #bbb4c2;
+}
+
+
+a:active {
+  text-decoration: none;
+  color: #bbb4c2;
+}
+
+div.header {
+	width: 100%;
+	margin-left: 0px;
+	margin-right: 0px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	padding: 0px;
+	border: 0px;
+	top: 0px;
+	left: 0px;
+	background-color: #58525e;
+}
+
+
+div.footer {
+	width: 100%;
+	margin-left: 0px;
+	margin-right: 0px;
+	margin-top: 5px;
+	margin-bottom: 0px;
+	padding: 0px;
+	border: 0px;
+	left: 0px;
+	background-color: #3d3639;
+}
+
+
+
+
+	div.bottom {
+		margin-top: 0px;
+		margin-left: 50px;
+		margin-right: 50px;
+		margin-bottom: 0px;
+	}
+
+
+
+	</style>
+</head>
+<body>
+	<div style="background-color: black; width:100%; height:30px; float:left;">
+	<a href="https://www.sfu.ca"><img src="black.png" style="float:left; width:60px; margin-right:20px; border:0px;"></a>
+</div>
+	<div style="background-color: #58525e;">
+<div class="header">
+	<big><center>
+	<div style="line-height: 2.0; padding-top:15px; padding-left:15px; padding-right: 15px;">
+	<a href="index.html">Home</a> &nbsp;&nbsp;
+	<a href="people.html">People</a> &nbsp;&nbsp;
+	<a href="papers.html">Papers</a> &nbsp;&nbsp;
+	<a href="software.html">Software</a> &nbsp;&nbsp;
+	Data &nbsp;&nbsp;
+	<a href="jc.html">JC</a> &nbsp;&nbsp;
+	<a href="events.html">Events</a> &nbsp;&nbsp;
+	<a href="teaching.html">Teaching</a>
+</div>
+</center></big>
+<span>&nbsp;
+	<div class="top">
+<h1><i>elliottlab</i></h1>
+</div>&nbsp;
+</span>
+</div> 
+<div>
+<div style="right:0px; top:98px; position: absolute;">
+<div style="margin: 0px; border-left: 0px; position: static; right: 0px; border-right: 0px; border-bottom: 0px; border-style: solid; border-color: #58525e;">
+	<table><tr><td>
+	<div style="position:relative; top:10px; margin-top:25px; margin-left:20px;">
+	 <i><big>Machine learning with beauty and care.</big></i>
+	</div></td><td>
+	<img style="top:4px; left: -5px; position: relative;" src="out4.png" width=250 height=273></td></tr></table>
+</div></div>
+</div>
+<div class="middle1">
+<span class="middle2">
+<div class="middle2" style="margin-top:30px;">
+	<div class="toc">
+
+</div>
+
+
+<h2><a id="introduction"></a>Data</h2>
+<div class="content" ><ul>
+            <li><a href="https://open.win.ox.ac.uk/ukbiobank/big40/">Oxford Brain Imaging Genetics Server - BIG40.</a> This open data server contains results from GWAS of almost 4,000 imaging-derived phenotypes from the <a href="https://www.fmrib.ox.ac.uk/ukbiobank/">multimodal brain imaging in UK Biobank</a>, using data from the 40,000 subject imaging data release from early 2020. The discovery sample size was 22,138 and the replication sample was 11,086. Chromosomes 1:22 and X are included, resulting in association tests with 20,381,044 genetic variants.<br><br>
+            The work was funded by the <a href="https://wellcome.ac.uk/">Wellcome Trust</a>. Compute resources were provided by the <a href="https://www.well.ox.ac.uk/research/scientific-cores/BMRC/">Oxford Biomedical Research Computing (BMRC)</a> facility (a joint development between Oxford's <a href="https://www.well.ox.ac.uk/">Wellcome Centre for Human Genetics</a> and the <a href="https://www.bdi.ox.ac.uk/">Big Data Institute</a>, supported by <a href="https://www.hdruk.ac.uk/">Health Data Research UK</a> and the <a href="https://oxfordbrc.nihr.ac.uk/">NIHR Oxford Biomedical Research Centre</a>). This work was conducted in part using the UK Biobank Resource under Application Number 8107.<br><br>
+            Lloyd T. Elliott (<a href="https://www.stat.sfu.ca">Department of Statistics and Actuarial Science, SFU</a>),
+Stephen Smith, Fidel Alfaro-Almagro, Paul McCarthy and Duncan Mortimer  (<a href="https://www.ndcn.ox.ac.uk/divisions/fmrib">Wellcome Centre for Integrative Neuroimaging</a>) contributed to this work.
+            </li>       
+</ul>
+
+
+		<div style="background-color:#9689a4; margin-left: 25px; margin-right: 25px; margin-bottom: 25px; margin-top: 25px; padding:10px; display: inline-block;">
+                <div class="top3">
+<center>
+			<a href="https://open.win.ox.ac.uk/ukbiobank/big40/">
+<img class="top3" src="mins-babyblue3.png" style="max-width:600px"></a>
+</center>
+</div>
+</div>
+
+</p>
+</div>
+
+</div>
+</div>
+<div class="footer" >
+<span>&nbsp;
+	<div class="bottom" style="bottom:0px; position:relative;">
+<i>Simon Fraser University acknowledges the Coast Salish People on whose traditional and unceded territories we are privileged to live, work and play.</i>
+</div>&nbsp;
+</span>
+</div>
+<script>
+$( "#button" ).button();
+$( "#button-icon" ).button({
+	icon: "ui-icon-gear",
+	showLabel: false
+});
+
+$( "#radioset" ).buttonset();
+
+$( "#controlgroup" ).controlgroup();
+
+$( "#dialog-link, #icons li" ).hover(
+	function() {
+		$( this ).addClass( "ui-state-hover" );
+	},
+	function() {
+		$( this ).removeClass( "ui-state-hover" );
+	}
+);
+</script>
+</span>
+</div>
+</body>
+</html>
