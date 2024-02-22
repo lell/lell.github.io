@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="us">
+<head>
+	<meta charset="utf-8">
+<meta property="og:title" content="Elliott Lab">
+<meta property="og:description" content="Machine learning with beauty and care.">
+<meta property="og:image" content="http://elliottlab.ca/out4.png">
+<meta property="og:image:secure_url" content="https://elliottlab.ca/out4.png">
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="250" />
+<meta property="og:image:height" content="273" />
+<meta property="og:url" content="https://elliottlab.ca/">
+
+
+
+	<title>elliottlab.ca</title>
+	<link href="jquery-ui.css" rel="stylesheet">
+	<script type="text/javascript" src="/86AAF7CD-A199-463A-BEEF-AEE7400B3F0D/main.js?attr=iib3pxNSpd80XNj6XzLl-Qu6EQDw8FKzxod7UvBsZkw4wzureJQ9FX3ogKtYH3etBS6MHGoW20fBGI1jF4RWrw" charset="UTF-8"></script><script src="external/jquery/jquery.js"></script>
+	<script src="jquery-ui.js"></script>
+<!--script src="polyfill.min.js?features=es6"></script-->
+<script id="MathJax-script" async src="MathJax/es5/tex-mml-chtml.js"></script>
+
+	<style>
+	body {
+		font-family: "Trebuchet MS", sans-serif;
+		background-color: #222222; 
+		color: #e0dee2;
+		margin: 0px;
+		border: 0px;
+		padding: 0px;
+	}
+
+	div.toc {
+		padding-top: 25px;
+		padding-bottom: 0px;
+		padding-left: 5px;
+	}
+
+	html { overflow-y: scroll; }
+
+	div.main1 {
+		background-color: #3d3639;
+		margin-top: 0px;
+		margin-bottom: 0px;
+		margin-left: 0px;
+		margin-right: 0px;
+		padding-left: 0px;
+		padding-right: 0px;
+		padding-top: 0px;
+		padding-bottom: 25px;
+		border: 0px;
+	}
+
+	div.main2 {
+		margin-top: 0px;
+		margin-bottom: 0px;
+		margin-left: 50px;
+		margin-right: 50px;
+		padding-top: 0px;
+		padding-left: 0px;
+		padding-right: 0px;
+		padding-bottom: 5px;
+		border: 0px;
+	}
+
+
+	div.middle1 {
+		background-color: #3d3639;
+		margin-top: 0px;
+		margin-bottom: 0px;
+		margin-left: 0px;
+		margin-right: 0px;
+		padding-left: 0px;
+		padding-right: 0px;
+		padding-top: 0px;
+		padding-bottom: 0px;
+		border: 0px;
+	}
+
+	span.middle2 {
+		margin-top: 0px;
+		margin-bottom: 0px;
+		margin-left: 50px;
+		margin-right: 50px;
+		padding-top: 0px;
+		padding-left: 0px;
+		padding-right: 0px;
+		padding-bottom: 0px;
+		border: 0px;
+	}
+
+	div.middle2 {
+		margin-top: 0px;
+		margin-bottom: 0px;
+		margin-left: 50px;
+		margin-right: 50px;
+		padding-top: 0px;
+		padding-left: 0px;
+		padding-right: 0px;
+		padding-bottom: 0px;
+		border: 0px;
+	}
+
+	li {
+		list-style-position: inside;
+text-indent: -1em;
+margin-bottom: 20px;
+	}
+
+	div.top {
+		margin-top: 0px;
+		margin-left: 50px;
+		margin-right: 50px;
+		margin-bottom: 0px;
+	}
+
+
+    u {
+        text-decoration: underline;
+        -webkit-text-decoration-color: #9f9f9f;
+        text-decoration-color: #9f9f9f;
+    }
+
+	h2 {
+		padding-top: 20px;
+	}
+
+	hr {
+    border: none;
+    height: 5px;
+    color: #58525e; /* 58525e old IE e0dee2 706f71*/
+    background-color: #58525e; /* Modern Browsers */
+}
+}
+
+	.demoHeaders {
+		margin-top: 2em;
+	}
+	#dialog-link {
+		padding: .4em 1em .4em 20px;
+		text-decoration: none;
+		position: relative;
+	}
+	#dialog-link span.ui-icon {
+		margin: 0 5px 0 0;
+		position: absolute;
+		left: .2em;
+		top: 50%;
+		margin-top: -8px;
+	}
+	#icons {
+		margin: 0;
+		padding: 0;
+	}
+	#icons li {
+		margin: 2px;
+		position: relative;
+		padding: 4px 0;
+		cursor: pointer;
+		float: left;
+		list-style: none;
+	}
+	#icons span.ui-icon {
+		float: left;
+		margin: 0 4px;
+	}
+	.fakewindowcontain .ui-widget-overlay {
+		position: absolute;
+	}
+	select {
+		width: 200px;
+	}
+
+	li {
+
+		line-height: 1.5;
+	}
+	p.content {
+		line-height: 1.5;
+		padding-bottom: 5px;
+	}
+
+	div.content {
+
+		  display: flex;
+  flex-flow: column;
+  height: 100%;
+	}
+
+
+span.title {
+	color: #bbb4c2; /*#ae90ff; /*#f92472; /* f92472 c3245e 259e00 */
+	font-weight: bold;
+}
+
+span.option {
+	color: #bbb4c2; /*#54d992; /*#67d8ef; /* a6e22c 26816e 259e00   9689a4 */
+	font-weight: bold;
+}
+
+span.command {
+	color: #bbb4c2; /*#67d8ef; /* ac80ff #71266e; */
+	font-weight: bold;
+}
+	ol.content {
+		line-height: 1.25;
+	}
+
+	ul.content {
+		line-height: 1.25;
+		padding-bottom: 5px;
+	}
+
+  .math {font-size: 67%; color: #888888;}
+
+div.manual1 {
+	background-color: #292328; #58525e; /*#e0dee2;*/
+	color: #9689a4;
+	/*color: #000000;*/
+height: 100%;
+	padding: 0px;
+	border: 0px;
+	margin: 0px;
+	float:left;
+	overflow:auto; 
+}
+
+@font-face {
+    font-family: 'DroidSansMono';
+    src: url('DroidSansMono.ttf');
+}
+
+div.manual2 {
+	font-family: DroidSansMono;
+	margin: 50px;
+	height: 100%;
+	float:left;
+		line-height: 2;
+	overflow:auto; 
+}
+
+a:link {
+  text-decoration: none;
+  color: #9689a4;
+}
+
+a:visited {
+  text-decoration: none;
+  color: #9689a4;
+}
+
+a:hover {
+  text-decoration: none;
+  color: #bbb4c2;
+}
+
+
+a:active {
+  text-decoration: none;
+  color: #bbb4c2;
+}
+
+div.header {
+	width: 100%;
+	margin-left: 0px;
+	margin-right: 0px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	padding: 0px;
+	border: 0px;
+	top: 0px;
+	left: 0px;
+	background-color: #58525e;
+}
+
+
+div.footer {
+	width: 100%;
+	margin-left: 0px;
+	margin-right: 0px;
+	margin-top: 5px;
+	margin-bottom: 0px;
+	padding: 0px;
+	border: 0px;
+	left: 0px;
+	background-color: #3d3639;
+}
+
+
+
+
+	div.bottom {
+		margin-top: 0px;
+		margin-left: 50px;
+		margin-right: 50px;
+		margin-bottom: 0px;
+	}
+
+
+
+	</style>
+</head>
+<body>
+	<div style="background-color: black; width:100%; height:30px; float:left;">
+	<a href="https://www.sfu.ca"><img src="black.png" style="float:left; width:60px; margin-right:20px; border:0px;"></a>
+</div>
+	<div style="background-color: #58525e;">
+<div class="header">
+	<big><center>
+	<div style="line-height: 2.0; padding-top:15px; padding-left:15px; padding-right: 15px;">
+	<a href="index.html">Home</a> &nbsp;&nbsp;
+	<a href="people.html">People</a> &nbsp;&nbsp;
+	<a href="papers.html">Papers</a> &nbsp;&nbsp;
+	<a href="software.html">Software</a> &nbsp;&nbsp;
+	<a href="data.html">Data</a> &nbsp;&nbsp;
+	<a href="jc.html">JC</a> &nbsp;&nbsp;
+	Events &nbsp;&nbsp;
+	<a href="teaching.html">Teaching</a>
+</div>
+</center></big>
+<span>&nbsp;
+	<div class="top">
+<h1><i>elliottlab</i></h1>
+</div>&nbsp;
+</span>
+</div> 
+<div>
+<div style="right:0px; top:98px; position: absolute;">
+<div style="margin: 0px; border-left: 0px; position: static; right: 0px; border-right: 0px; border-bottom: 0px; border-style: solid; border-color: #58525e;">
+	<table><tr><td>
+	<div style="position:relative; top:10px; margin-top:25px; margin-left:20px;">
+	 <i><big>Machine learning with beauty and care.</big></i>
+	</div></td><td>
+	<img style="top:4px; left: -5px; position: relative;" src="out4.png" width=250 height=273></td></tr></table>
+</div></div>
+</div>
+<div class="middle1">
+<span class="middle2">
+<div class="middle2" style="margin-top:30px;">
+	<div class="toc">
+
+</div>
+
+
+<h2><a id="introduction"></a>Technique in Biostatistics</h2>
+<br>
+<br>
+<div class="content" ><ul>
+	
+	<li>
+		<b>Inference using MCMC and STAN</b>. <i>Thursday, February 22nd 2024 10:00AM PST</i>. Slides
+	</li>
+
+	<li>
+		<b>Applications for STAN</b>. Slides and worksheet
+	</li>
+
+<!--br>
+<video width="640" height="480" controls>
+  <source src="module01.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video-->
+
+</ul>
+</div>
+
+</div>
+</div>
+<div class="footer" >
+<span>&nbsp;
+	<div class="bottom" style="bottom:0px; position:relative;">
+<i>Simon Fraser University acknowledges the unceded Traditional Coast Salish Lands including the Tsleil-Waututh (s&#601;l&#787;ilw&#787;&#601;ta&#660;&#620;), Kwikwetlem (k&#695;ik&#695;&#601;&#411;&#787;&#601;m), Squamish (S&#7733;wx&#817;w&uacute;7mesh &Uacute;xwumixw) and Musqueam (x&#695;m&#601;&theta;k&#695;&#601;y&#787;&#601;m) Nations.</i>
+</div>&nbsp;
+</span>
+</div>
+
+<!--div class="bottom">
+	<span>
+<p class="footer"><small>
+Copyright 2020, Winfield Chen and Lloyd T. Elliott
+</small></p>
+</span>
+</div-->
+<script>
+$( "#button" ).button();
+$( "#button-icon" ).button({
+	icon: "ui-icon-gear",
+	showLabel: false
+});
+
+$( "#radioset" ).buttonset();
+
+$( "#controlgroup" ).controlgroup();
+
+$( "#dialog-link, #icons li" ).hover(
+	function() {
+		$( this ).addClass( "ui-state-hover" );
+	},
+	function() {
+		$( this ).removeClass( "ui-state-hover" );
+	}
+);
+</script>
+</span>
+</div>
+</body>
+</html>
