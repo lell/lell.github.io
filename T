@@ -1,0 +1,305 @@
+#!/bin/env -w
+# T
+# Copyright (c) 2016, Lloyd T. Elliott.
+# 
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# 
+# 1. Redistributions of source code must retain the above copyright notice, this
+# list of conditions and the following disclaimer.
+# 
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# To install this script, create the directory ~/bin if it does not exist and
+# copy this file to ~/bin. Then, add the line "export PATH=$PATH:$HOME/bin" to
+# your ~/.bash_profile file. Then, make the script executable using the command
+# "chmod +x ~/bin/T"
+
+use strict;
+use File::Temp qw/ tempfile tempdir /;
+use Getopt::Std;
+use Text::ParseWords;
+
+if (@ARGV == 1 and ($ARGV[0] eq "--help" or $ARGV[0] eq "-h")) {
+  print STDERR<<'EOT';
+    T: Transpose comma, tab or whitespace separated variable files. This is a
+  relatively fast command line utility written in perl, and it will work even
+  if your files are too big to fit completely into RAM.
+
+USAGE:
+
+    T [-d<DELIMITER>] [-q<QUOTE>] [-o<FILE>] [-M] [-o <FILE>] [<FILE1>
+     [<FILE2> ...]]
+
+    Each string provided after the command line flags and switches (<FILE1>,
+  <FILE2>, ...) will be treated as a file to transpose. The files are
+  processed in order, by treating them as matrices of strings (one row per
+  line) which are transposed and printed to the standard output (or to a
+  specified output file). If more than one file is provided, the transposed
+  versions of each file will be vertically concatenated in the output. If no
+  file is provided, then the standard input will be read and transposed. If
+  the special string '-' (just a dash) is provided along with 0 or more files,
+  when T reaches the position of '-' in the list of provided files, the matrix
+  to be transposed in that position will be read from the standard input.
+
+   -d<DELIMITER> switch to specify the delimiter of the input. The argument
+  <DELIMITER> to the '-d' switch must be ',', '\t', ' ' or '\s+',
+  corresponding to comma, tab, space or whitespace separated variable files
+  respectively. Note that to write '\t' you must provide the character
+  backslash followed by the character t, and so you will have to escape the
+  backslash with single quotes as shown here (or use another backslash). The
+  default is whitespace separated variable files. In each case, T will split
+  each line of input on <DELIMITER> and treat each element of the split as a
+  matrix entry. Each file (and the standard input, if applicable) must use the
+  same delimiter. The '\s+' (whitespace) delimiter will split each line on any
+  string of consecutive (non-newline) whitespace characters (i.e., spaces and
+  tabs), with any leading or tailing whitespace trimmed.
+
+   -q<QUOTE> switch to specify that the input can be quoted. If the switch '-q'
+  is provided, the argument <QUOTE> will be treated as a quote character, and
+  any instances of delimiters occurring between a pair of quotes will not be
+  used to split matrix entries. The argument <QUOTE> must be '"', "'", ''
+  (i.e., it must be the double quote character or the single quote character
+  or the empty string).
+
+   -M flag to specify big data. If this flag is specified, temporary files will
+  be created in the current working directory and used to provide additional
+  memory. These files are deleted when they're no longer needed or if T
+  generates an error. If the number of columns in a provided file (or in the
+  standard input) is greater than the number of file descriptors allowed per
+  process by your operating system, then an error will be generated and that
+  file (or the standard input) will be skipped and no output will be printed
+  for the matrix in that position. This flag causes T to be slower and so if
+  -M isn't specified T will always try to use RAM and so it will generate an
+  error and skip the matrix if your RAM becomes exhausted.
+
+   -o<FILE> switch to specify output file. If '-o' is provided then instead of
+  printing the transposed input to the standard output, the transposed input
+  will be printed to the file <FILE> (and it will be overwritten if it already
+  exists).
+
+EXAMPLE:
+
+   > T
+   1 2 3 4
+   5 6 7 8
+   ^D
+   1 5
+   2 6
+   3 7
+   4 8
+   >
+
+Copyright (c) 2016, Lloyd T. Elliott.
+
+EOT
+  exit 0;
+}
+my %opts;
+my $q = '';
+my $d = '\s+';
+my $ofile = "-";
+my $fo = \*STDOUT;
+my $rv;
+my $error = "";
+{
+  my $fh;
+  open($fh, ">", \$error);
+  local *STDERR = $fh;
+  $rv = &getopts('d:q:nMo:', \%opts);
+  close $fh;
+}
+if ($rv == 0) {
+  chomp($error);
+  print STDERR "T: $error (try T --help).\n";
+  exit 1;
+}
+if (exists $opts{d}) {
+  $d = $opts{d};
+  if (!defined($d)) {
+    print STDERR 'T: Argument to \'-d\' (delimiter) must be provided (\',\', \' \', \'\t\' or default \'\s+\'). Try T --help.';
+    print STDERR "\n";
+    exit 1;
+  }
+  if (!($d eq ' ' || $d eq '\t' || $d eq '\s+' || $d eq ',')) {
+    print STDERR 'T: Delimeter must be \',\', \' \', \'\t\' or \'\s+\' (default). Try T --help.';
+    print STDERR "\n";
+    exit 1;
+  }
+}
+if (exists $opts{q}) {
+  $q = $opts{q};
+  if (!defined($q)) {
+    print STDERR 'T: Argument to \'-q\' (quote) must be provided (\'"\', \'\\\'\' or default \'\'). Try T --help.';
+    print STDERR "\n";
+    exit 1;
+  }
+  if (!($q eq '"' || $q eq "'")) {
+    print STDERR 'T: Quote character must be \'"\', \'\\\'\' or \'\' (default). Try T --help.';
+    print STDERR "\n";
+    exit 1;
+  }
+}
+if (exists $opts{o}) {
+  $ofile = $opts{o};
+  if (!defined($ofile)) {
+    print STDERR 'T: Argument to \'-o\' (quote) must be provided. Try T --help.';
+    print STDERR "\n";
+    exit 1;
+  }
+  if ($ofile eq "-") {
+    ;
+  } elsif (!defined open($fo, ">", $ofile)) {
+    print STDERR "T: Could not open '$ofile' for writing.\n";
+    exit 1;
+  }
+}
+if ($#ARGV == -1) {
+  $ARGV[0] = "-";
+}
+for my $ifile (@ARGV) {
+  chomp($ifile);
+  my $fi;
+  if ($ifile eq "-") {
+    $fi = \*STDIN;
+  } else {
+    if (!defined open($fi, "<", $ifile)) {
+      print STDERR "T: Cannot open file '$ifile' for reading.\n";
+      next;
+    }
+  }
+  my $n = -2;
+  my $m;
+  my $line = 1;
+  my $must_be_last = 0;
+  my @Mfis;
+  my @Mfns;
+  my $tempdir;
+  my $first = 1;
+  while (<$fi>) {
+    chomp;
+    if ($d eq '\s+') {
+      s/^\s+//;
+      s/\s+$//;
+    }
+    if ($must_be_last) {
+      print STDERR sprintf("T: Line %d of file '$ifile' does not contain %d entries.\n", $line, $n+1);
+      exit 1;
+    }
+    my @F;
+    if ($q eq '') {
+      @F = split /$d/;
+    } else {
+      @F = quotewords($d, 1, $_);
+    }
+    if ($n == -2) {
+      $n = @F - 1;
+      if ($opts{M}) {
+        if (!(-w ".") or !(-x ".")) {
+          print STDERR "T: Cannot create temporary files in current directory.\n";
+          exit 1;
+        }
+        $tempdir = tempdir(".T.XXXXXX", DIR => ".", CLEANUP => 1);
+        for my $i (0..$n) {
+          my ($a, $b) = tempfile(".XXXXXX", DIR => $tempdir, UNLINK => 1);
+          $Mfis[$i] = $a;
+          $Mfns[$i] = $b;
+        }
+      }
+    } elsif ($n > 0 and $n != @F - 1) {
+      print STDERR sprintf("T: Line $line of file '$ifile' does not contain %d entries.\n", $n+1);
+      exit 1;
+    }
+    if (@F > 0) {
+      $line++;
+      if ($opts{M}) {
+        for my $i (0..$n) {
+          my $fh = $Mfis[$i];
+          if (!$first) {
+            if ($d eq '\s+') {
+              $rv = print $fh ' ';
+            } elsif ($d eq '\t') {
+              $rv = print $fh "\t";
+            } else {
+              $rv = print $fh $d;
+            }
+            if (!$rv) {
+              print STDERR "T: Could not write to temporary file.\n";
+              exit 1;
+            }
+          } 
+          if (!print $fh $F[$i]) {
+            print STDERR "T: Could not write to temporary file.\n";
+            exit 1;
+          }
+        }
+      } else {
+        for my $i (0..$n) {
+          push @{ $m->[$i] }, $F[$i];
+        }
+      }
+      $first = 0;
+    } elsif ($n != -1) {
+      $must_be_last = 1;
+    }
+  }
+  close($fi);
+  if ($line == 1) {
+    next;
+  }
+  if ($opts{M}) {
+    for my $i (0..$n) {
+      close($Mfis[$i]);
+      my $fh;
+      if (!defined open($fh, "<", $Mfns[$i])) {
+        print STDERR "T: Could not open temporary file for reading.\n";
+        exit 1;
+      }
+      $_ = <$fh>;
+      if (!print $fo ($_ . "\n")) {
+        if ($ofile eq "-") {
+          print STDERR "T: Could not write to standard output.\n";
+        } else {
+          print STDERR "T: Could not write to $ofile.\n";
+        }
+        exit 1;
+      }
+      close($fh);
+    }
+  } else {
+    for my $r (@$m) {
+      if (!print $fo join(" ", @$r)) {
+        if ($ofile eq "-") {
+          print STDERR "T: Could not write to standard output.\n";
+        } else {
+          print STDERR "T: Could not write to $ofile.\n";
+        }
+        exit 1;
+      }
+      if (!print $fo "\n") {
+        if ($ofile eq "-") {
+          print STDERR "T: Could not write to standard output.";
+        } else {
+          print STDERR "T: Could not write to $ofile.";
+        }
+        print STDERR "\n";
+        exit 1;
+      }
+    }
+  }
+}
