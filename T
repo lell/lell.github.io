@@ -1,4 +1,4 @@
-#!/bin/env -w
+#!/usr/bin/env perl -w
 # T
 # Copyright (c) 2016, Lloyd T. Elliott.
 # 
@@ -28,7 +28,8 @@
 # To install this script, create the directory ~/bin if it does not exist and
 # copy this file to ~/bin. Then, add the line "export PATH=$PATH:$HOME/bin" to
 # your ~/.bash_profile file. Then, make the script executable using the command
-# "chmod +x ~/bin/T"
+# "chmod +x ~/bin/T". You must have perl installed to use this script. To
+# install perl in macos using the brew package manager, use "brew install perl".
 
 use strict;
 use File::Temp qw/ tempfile tempdir /;
