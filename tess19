@@ -1,0 +1,797 @@
+#!/usr/bin/env Rscript
+# tess19 v1.0. Copyright (c) 2019. Shufei Ge and Lloyd T. Elliott.
+
+suppressMessages(library(optparse))
+
+exit_quietly = function() {
+opt <- options(show.error.messages = FALSE)
+on.exit(options(opt))
+sink(file="/dev/null", type = "output")
+sink(file="/dev/null", type = "message")
+blankMsg <- sprintf("\r%s\r", paste(rep(" ", getOption("width")-1L),
+collapse=" "));
+stop(simpleError(blankMsg));
+}
+
+print_license = function() {
+cat(sprintf("tess19 v1.0. Copyright (c) 2019. Shufei Ge and Lloyd T. Elliott.      \n"))
+cat(sprintf("                                                                      \n"))
+cat(sprintf("Redistribution and use in source and binary forms, with or without    \n"))
+cat(sprintf("modification, are permitted provided that the following conditions    \n"))
+cat(sprintf("are met:                                                              \n"))
+cat(sprintf("                                                                      \n"))
+cat(sprintf("1. Redistributions of source code must retain the above copyright     \n"))
+cat(sprintf("notice, this list of conditions and the following disclaimer.         \n"))
+cat(sprintf("                                                                      \n"))
+cat(sprintf("2. Redistributions in binary form must reproduce the above copyright  \n"))
+cat(sprintf("notice, this list of conditions and the following disclaimer in the   \n"))
+cat(sprintf("documentation and/or other materials provided with the distribution.  \n"))
+cat(sprintf("                                                                      \n"))
+cat(sprintf("THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS   \n"))
+cat(sprintf("'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT     \n"))
+cat(sprintf("LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR \n"))
+cat(sprintf("A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT  \n"))
+cat(sprintf("HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,\n"))
+cat(sprintf("SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT      \n"))
+cat(sprintf("LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, \n"))
+cat(sprintf("DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY \n"))
+cat(sprintf("THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT   \n"))
+cat(sprintf("(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE \n"))
+cat(sprintf("OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  \n\n\n"))
+exit_quietly()
+}
+
+print_help = function() {
+cat(sprintf("tess19 v1.0. Copyright (c) 2019. Shufei Ge and Lloyd T. Elliott.\n"))
+cat(sprintf("\n"))
+cat(sprintf("The tess19 software implements the Bayesian nonparametric methods    \n"))
+cat(sprintf("described in Ge et al, 'Random Tessellation Forests', 2019. This     \n"))
+cat(sprintf("software constructs a random forest for posterior prediction of      \n"))
+cat(sprintf("categorical data based on real valued predictors. The trees of the   \n"))
+cat(sprintf("random forest are found through SMC inference. This manual is for    \n"))
+cat(sprintf("version v1.0. This software requires the following R packages:       \n"))
+cat(sprintf("optparse, purrr. This software is released under the open source     \n"))
+cat(sprintf("BSD 2-clause license. \n"))
+cat(sprintf("\n"))
+cat(sprintf("      BASIC USAGE\n"))
+cat(sprintf("\n"))
+cat(sprintf("  tess19 <IFILE.txt> <OFILE.txt>\n"))
+cat(sprintf("\n"))
+cat(sprintf("Predictions for the missing labels in the 'Levels' column of the    \n"))
+cat(sprintf("file <IFILE.txt> are made using the predictors in the file          \n"))
+cat(sprintf("<IFILE.txt> and the uRTF model, with 100 trees, with the            \n"))
+cat(sprintf("prespecified budget tau = infinity, and with the hyperparameter     \n"))
+cat(sprintf("settings alpha_k = n_k/1000. The predictions are saved in the       \n"))
+cat(sprintf("'Levels' column of the file <OFILE.txt>. \n"))
+cat(sprintf("\n"))
+cat(sprintf("The format of the file <IFILE.txt> is as follows. The file is space \n"))
+cat(sprintf("separated. The first line is a header line with one column name for \n"))
+cat(sprintf("each of predictor (for example, 'V1 V2 ...'), followed by a column  \n"))
+cat(sprintf("named 'Levels'. Subsequent lines are given with one line per data   \n"))
+cat(sprintf("item, with the predictors for the data item followed by the items   \n"))
+cat(sprintf("level. The predictors are real numbers and the levels must be       \n"))
+cat(sprintf("positive integers in the set 1 ... K, where K is the number of      \n"))
+cat(sprintf("levels. Both test and train data must be provided in <IFILE.txt>,   \n"))
+cat(sprintf("and the test data items must have missing labels indicated by the   \n"))
+cat(sprintf("string 'NaN'. The predictors may not have missing data.\n"))
+cat(sprintf("\n"))
+cat(sprintf("The format of the file <OFILE.txt> is as follows. The first line is \n"))
+cat(sprintf("a header line naming the column 'Levels' (ie, one column).          \n"))
+cat(sprintf("Subsequent lines are given with one line for data item. If the data \n"))
+cat(sprintf("item is a training data item, then the value 'NaN' is recorded in   \n"))
+cat(sprintf("the corresponding line. If the data item is a testing data item,    \n"))
+cat(sprintf("then a predicted label is recorded.\n"))
+cat(sprintf("\n"))
+cat(sprintf("      ADVANCED USAGE\n"))
+cat(sprintf("\n"))
+cat(sprintf("  tess19 --usage\n"))
+cat(sprintf("\n"))
+cat(sprintf("  tess19 --license\n"))
+cat(sprintf("\n"))
+cat(sprintf("  tess19 --version\n"))
+cat(sprintf("\n"))
+cat(sprintf("  tess19 [--Mondrian] [--weights <WFILE.txt>] [--cuts <MAX-CUTS>] \n"))
+cat(sprintf("         [--tau <PRESPECIFIED-BUDGET>] [--alpha <HYPER-PARAMETER>]\n"))
+cat(sprintf("         [--ntrees <NUMBER-OF-TREES>] [--particles <PARTICLES>]   \n"))
+cat(sprintf("         [--seed <SEED>] <IFILE.txt> <OFILE.txt>\n\n"))
+cat(sprintf("    --usage. Prints this manual to the standard output.\n"))
+cat(sprintf("\n"))
+cat(sprintf("    --license. Prints the open source BSD 2-clause license for    \n"))
+cat(sprintf("    this software.\n"))
+cat(sprintf("\n"))
+cat(sprintf("    --version. Prints the software version information.\n"))
+cat(sprintf("\n"))
+cat(sprintf("    --Mondrian. Instructs tess19 to conduct axis aligned cuts,    \n"))
+cat(sprintf("    yielding the MRTF model, or (if --weights flag is provided)   \n"))
+cat(sprintf("    the wMRTF model. By default, axis aligned cuts are not used.  \n"))
+cat(sprintf("\n"))
+cat(sprintf("    --weights <WFILE.txt>. Instructs tess19 to use a weighted     \n"))
+cat(sprintf("    version of the uniform distribution for the measure lambda^{d-1},\n"))
+cat(sprintf("    yielding the wuRTF or wMRTF mdoel. The weights are read from \n"))
+cat(sprintf("    the file <WFILE.txt> which must contain d lines corresponding \n"))
+cat(sprintf("    the prior weight for each predictor, with one real number per \n"))
+cat(sprintf("    line.\n"))
+cat(sprintf("\n"))
+cat(sprintf("    --cuts <MAX-CUTS>. This flag sets a stopping condition wherein \n"))
+cat(sprintf("    SMC particles will return after <MAX-CUTS> cuts, regardless of \n"))
+cat(sprintf("    the budget. By default, <MAX-CUTS> is set to 100. This value   \n"))
+cat(sprintf("    must be a positive integer. By the pausing condition, each cut \n"))
+cat(sprintf("    separates a data item, and setting <MAX-CUTS> to a value larger\n"))
+cat(sprintf("    than or equal to the number of data items is equivalent to     \n"))
+cat(sprintf("    setting <MAX-CUTS> to infinity. \n"))
+cat(sprintf("\n"))
+cat(sprintf("    --tau <PRESPECIFIED-BUDGET>. This flag specifies the budget.   \n"))
+cat(sprintf("    The budget tau must be a positive real number, or infinity. By \n"))
+cat(sprintf("    default, tau is set to infinity.\n"))
+cat(sprintf("\n"))
+cat(sprintf("    --alpha <HYPER-PARAMETER>. This flag is a positive real number \n"))
+cat(sprintf("    that sets the coefficient of the empirical label proportion in \n"))
+cat(sprintf("    the Dirichlet/multinomial prior, so that the value of the      \n"))
+cat(sprintf("    hyperparameter is alpha_k = <HYPER-PARAMETER> * n_k. The       \n"))
+cat(sprintf("    default value is 1E-3.\n"))
+cat(sprintf("\n"))
+cat(sprintf("    --ntrees <NUMBER-OF-TREES>. This flag is a positive integer    \n"))
+cat(sprintf("    that sets the number of trees to use in the random forest. By  \n"))
+cat(sprintf("    default, <NUMBER-OF-TREES> is set to 100. A value of 1         \n"))
+cat(sprintf("    specifies the uRTP/wuRTP/MRTP/wMRTP priors (i.e., no random    \n"))
+cat(sprintf("    forest).\n"))
+cat(sprintf("\n"))
+cat(sprintf("    --particles <PARTICLES>. This flag sets the number of particles\n"))
+cat(sprintf("    to use in the SMC approximations. The default value of         \n"))
+cat(sprintf("    <PARTICLES> is 100. \n"))
+cat(sprintf("\n"))
+cat(sprintf("    --seed <SEED>. This flag sets the random seed to <SEED>. The  \n"))
+cat(sprintf("    default is to use to use the system clock to set the random   \n"))
+cat(sprintf("    seed. \n"))
+exit_quietly()
+}
+
+print_version = function() {
+cat(sprintf("                                                              \n"))
+cat(sprintf("                   ▄▄█████▄▄                                  \n"))
+cat(sprintf("                  ▐██████████▄   ▄▄▄     ▄▄▄▄▄  ▄▄███▄▄       \n"))
+cat(sprintf("                  █████████████▐█████▄████████▄███████▀       \n"))
+cat(sprintf("                   ██▀▀███▌▄▀███▀▀  ▄███████▀█▌███████        \n"))
+cat(sprintf("                      ████▐███     ████████   ▐████ 19        \n"))
+cat(sprintf("                     ████▌████▄    ▐██████▌    ███▄           \n"))
+cat(sprintf("                    ▐████▐██        ██████▄     █████         \n"))
+cat(sprintf("                    ▐████▌███   ▄██  ▀█████▌ ▄▄  ████▌        \n"))
+cat(sprintf("                    ▐█████ ████████▄ █ ▀███▌▐██▄ ▄███         \n"))
+cat(sprintf("                     ▀████▌ ▀███▀▀▀ ███▄███▀████████          \n"))
+cat(sprintf("                      ▀███▀           ▀▀▀▀   ▀████▀           \n"))
+cat(sprintf("                             tess19 v1.0                      \n"))
+cat(sprintf("                                                              \n"))
+cat(sprintf("           Copyright (c) 2019. Shufei Ge and Lloyd T. Elliott.\n"))
+cat(sprintf("\n"))
+cat(sprintf("  Use tess19 --usage for help.\n"))
+cat(sprintf("  Use tess19 --license to print the software license.\n"))
+cat(sprintf("  Use tess19 --version for this message.\n\n\n"))
+exit_quietly()
+}
+
+print_error = function(message) {
+cat(sprintf('tess19: %s.\n', message))
+exit_quietly()
+}
+
+args = commandArgs(trailingOnly = TRUE)
+if (length(args) == 0) {
+print_version()
+}
+
+if (length(args) > 1) {
+fname = args[length(args)-1]
+gname = args[length(args)]
+args = args[-c(length(args) - 1, length(args))]
+}
+
+
+option_list <- list(
+make_option("--version", action = "store_true", default = FALSE), #
+make_option("--usage", action = "store_true", default = FALSE),
+make_option("--license", action = "store_true", default = FALSE), #
+make_option("--Mondrian", action = "store_true", default = FALSE), #
+make_option("--weights", default = FALSE), #
+make_option("--cuts", default = 100), #
+make_option("--tau", default = Inf), #
+make_option("--alpha", default = 1e-3),
+make_option("--ntrees", default = 100), #
+make_option("--particles", default = 100), #
+make_option("--seed", default = -1) #
+)
+
+opt = parse_args(OptionParser(option_list = option_list), args = args)
+
+if (opt$version) {
+if (length(args) > 1) {
+print_error('Argument error (2)')
+} else {
+print_version()
+}
+}
+
+if (opt$license) {
+if (length(args) > 1) {
+print_error('Argument error (3)')
+} else {
+print_license()
+}
+}
+
+if (opt$usage) {
+if (length(args) > 1) {
+print_error('Argument error (4)')
+} else {
+print_help()
+}
+}
+
+if (!file.exists(fname)) {
+print_error('<IFILE.txt> does not exist')
+}
+
+if (opt$Mondrian) {
+cut.type = 2
+} else {
+cut.type = 1
+}
+
+ALPHA = as.numeric(opt$alpha)
+if (ALPHA < 0) {
+print_error('Argument to --alpha must be positive')
+}
+
+cat(sprintf('tess19 v1.0. Copyright (c) 2019. Shufei Ge and Lloyd T. Elliott.\n\n'))
+cat(sprintf('%s ', format(Sys.time(), "%a %b %d %X %Y")))
+cat(sprintf('%s\n\n', getwd()))
+
+l.max=as.numeric(opt$cuts) #100  #this would be same as setting tau=Inf if number of train data points <100.
+# set l.max to a large number greater than or equal to # of obs, if setting tau=Inf;
+# otherwise, the inference will terminate when either tau reaches the budget or
+# number of cuts exceeds the l.max.
+split.seed=as.numeric(opt$seed)
+if (split.seed == -1) {
+split.seed = as.integer((as.double(Sys.time())*1000+Sys.getpid()) %% 2^31)
+set.seed(split.seed)
+}
+tau=as.numeric(opt$tau)
+sample.type=1
+accept.rate.min=0.05
+N=as.numeric(opt$particles)
+rep.max=as.numeric(opt$ntrees)
+
+if (opt$weight) {
+if (!file.exists(opt$weight)) {
+print_error('Could not open weight file')
+}
+w.normal=scan(opt$weight, numeric(), quote = "")
+w.normal <- w.normal/sum(w.normal)
+} else {
+w.normal = NULL
+}
+
+cat(sprintf('Arguments:\n'))
+if (opt$Mondrian) {
+cat(sprintf('  --method Mondrian\n')) }
+if (opt$weights != FALSE) {
+cat(sprintf("  --weights '%s'\n", opt$weights)) }
+cat(sprintf('  --cuts %d\n', opt$cuts))
+cat(sprintf('  --tau %g\n', opt$tau))
+cat(sprintf("  --alpha %g\n", opt$alpha))
+cat(sprintf("  --ntrees %d\n", opt$ntrees)) #
+cat(sprintf("  --particles %d\n", opt$particles)) #
+cat(sprintf("  --seed %d\n\n", split.seed)) #
+
+cat(sprintf("  IFILE '%s'\n", fname)) #
+cat(sprintf("  OFILE '%s'\n\n", gname)) #
+
+cat(sprintf('Loading packages.\n'))
+suppressMessages(library(purrr)    )
+
+cat(sprintf('Loading data.\n'))
+data  <-  read.table(fname, sep = ' ', row.names = NULL, header = TRUE)
+d     <- dim(data)[2]-1
+V.all <-  as.matrix(data[,1:d])
+
+if(l.max==Inf){
+l.max=dim(data)[1]
+}
+
+min <- matrix(apply(V.all,2,min),nrow=dim(V.all)[1],ncol=dim(V.all)[2],byrow=TRUE)
+max <- matrix(apply(V.all,2,max),nrow=dim(V.all)[1],ncol=dim(V.all)[2],byrow=TRUE)
+V.all <- (V.all-min)/(max-min)
+rm("min","max")
+
+
+V.label <- data[,(d+1)]
+id.test <- which(is.nan(V.label))
+V.label[id.test]<- NA #set the unknow labels as NA; otherwise, they will be grouped as a new group.
+group <- as.factor(V.label)
+
+group.level <- levels(group)
+group.len <- length(group.level)
+
+Cut_plane_standard <- function(V,V.ID,V.label,sample.type,cut.type,accept.rate.min,dist.max=NA,w.normal=NULL){
+d <- dim(V)[2]
+P.u <- rep(NA,d)
+theta <- rep(NA,(d-1))
+mu <- c(NA)
+len.projection <- c(NA)
+normal.v <- rep(NA,d)
+sample.cut.count <- 1
+V.left.ID <-NULL
+V.right.ID <- NULL
+if(is.null(w.normal)){
+w.normal <- rep(1/d,d)
+}
+
+if(sum(!is.na(V.label))>0){
+V.unique <- unique(V[!is.na(V.label),])
+d1 <- dim(V.unique)[1]
+if(is.na(dist.max)){
+if(d1==1){
+dist.max <- 0
+}else{
+dist.max <- max(dist(V.unique))
+}
+}
+#skip the cut if all obs are from the same group(pausing condition)
+# or if labled vertices are same
+skip.index <- (sum(table(V.label)!=0)==1) | dist.max==0
+}else{
+skip.index =1 # skip if all vertices are unlabled
+}
+
+
+if(!skip.index){
+if(sample.type==1){
+# use the largest distance between vertices as upper bound instead of the diameter of the
+# smallest d-sphere, since
+# length(projection.line.segment(Vertices))<= max{dist between Vertices}
+#                                         <= the diameter of the smallest sphere
+# dist.max would be the smallest boundary of the rejection sampling
+run.index <- 1
+if(cut.type==1){
+while(run.index){
+
+
+normal.v <- rnorm(d,sd=0.1)
+normal.v <- w.normal*normal.v
+normal.v <- normal.v/sqrt(sum(normal.v^2))
+
+t.scale <-  V%*%matrix(normal.v,nrow=d,ncol=1)/sum(normal.v^2)
+t.scale.train <- t.scale[!is.na(V.label)]
+t.scale.ends <- range(t.scale.train,na.rm = TRUE)
+V.projection.ends <-rbind(t.scale.ends[1]*normal.v,t.scale.ends[2]*normal.v)
+len.projection <- diff(t.scale.ends)*sqrt(sum(normal.v^2))
+
+mu <- runif(1,min=0,max=dist.max)
+mu <- mu/len.projection
+if(mu<1){
+t.scale.mu <- (1-mu)*t.scale.ends[1]+mu*t.scale.ends[2]
+#if(any(t.scale<t.scale.mu) && any(t.scale>t.scale.mu)){
+if(any(t.scale.train<=t.scale.mu) && any(t.scale.train>t.scale.mu)){
+run.index <- 0
+P.u <- (1-mu)*V.projection.ends[1,]+mu*V.projection.ends[2,]
+V.left.ID <- which(t.scale<=t.scale.mu)
+V.right.ID <- which(t.scale>t.scale.mu)
+}
+}else{
+sample.cut.count <- sample.cut.count+1
+run.index <- (1/sample.cut.count>accept.rate.min)*1
+skip.index <- 1-run.index
+}
+}
+}else{
+while(run.index){
+
+normal.v<- c(rmultinom(1,size=1,prob=w.normal))
+
+
+t.scale <-  V%*%matrix(normal.v,nrow=d,ncol=1)/sum(normal.v^2)
+t.scale.train <- t.scale[!is.na(V.label)]
+t.scale.ends <- range(t.scale.train,na.rm = TRUE)
+V.projection.ends <-rbind(t.scale.ends[1]*normal.v,t.scale.ends[2]*normal.v)
+len.projection <- diff(t.scale.ends)*sqrt(sum(normal.v^2))
+
+
+mu <- runif(1,min=0,max=dist.max)
+mu <- mu/len.projection
+
+if(mu<1){
+t.scale.mu<-(1-mu)*t.scale.ends[1]+mu*t.scale.ends[2]
+if(any(t.scale.train<=t.scale.mu) && any(t.scale.train>t.scale.mu)){
+run.index <- 0
+P.u <- (1-mu)*V.projection.ends[1,]+mu*V.projection.ends[2,]
+V.left.ID <- which(t.scale<=t.scale.mu)
+V.right.ID <- which(t.scale>t.scale.mu)
+}
+
+}else{
+sample.cut.count <- sample.cut.count+1
+run.index <- (1/sample.cut.count>accept.rate.min)*1
+skip.index <- 1-run.index
+}
+}
+}
+}else{
+run.index <- 1
+while(run.index){
+
+if(cut.type==1){
+normal.v <- rnorm(d,sd=0.1)
+normal.v <- w.normal*normal.v
+normal.v <- normal.v/sqrt(sum(normal.v^2))
+
+
+}else{
+normal.v<- c(rmultinom(1,size=1,prob=w.normal))
+
+}
+
+t.scale <-  V%*%matrix(normal.v,nrow=d,ncol=1)/sum(normal.v^2)
+t.scale.train <- t.scale[!is.na(V.label)]
+t.scale.ends <- range(t.scale.train,na.rm = TRUE)
+V.projection.ends <-rbind(t.scale.ends[1]*normal.v,t.scale.ends[2]*normal.v)
+len.projection <- diff(t.scale.ends)*sqrt(sum(normal.v^2))
+
+mu <- runif(1,0,1)
+t.scale.mu<-(1-mu)*t.scale.ends[1]+mu*t.scale.ends[2]
+
+if(any(t.scale.train<=t.scale.mu) && any(t.scale.train>t.scale.mu)){
+run.index <- 0
+P.u <- (1-mu)*V.projection.ends[1,]+mu*V.projection.ends[2,]
+V.left.ID <- which(t.scale<=t.scale.mu)
+V.right.ID <- which(t.scale>t.scale.mu)
+}else{
+sample.cut.count <- sample.cut.count+1
+run.index <- (sample.cut.count<11)*1
+skip.index <- 1-run.index
+}
+
+}
+
+}
+}
+return(list(N_vec= normal.v,Pu=P.u,
+Len.projection=len.projection,dist.max=dist.max,
+sample.cut.count=sample.cut.count,
+skip.index=skip.index,
+V.left.ID=V.left.ID,
+V.right.ID=V.right.ID
+))
+}
+
+
+
+
+
+#app_qhull <- function(V,d){
+#  V.unique <- unique(V)
+#  if(dim(V.unique)[1]==1){
+#    Lambda <- 0
+#    radius.V<-0
+#  }else{
+#    radius.V <- max(dist(V.unique))/2
+#    Lambda   <- radius.V
+#  }
+#  return(c(Lambda, radius.V*2))
+#}
+
+
+
+
+
+
+Generative_Process <- function(partition,V.all,V.label,tau,group.level,group.len,sample.type,cut.type,accept.rate.min,w.normal){
+l <- length(partition$Polytopes)
+d <- dim(V.all)[2]
+tau.v <- partition$tau
+result <- c(0,0,0)
+Cut <- list()
+cut.idx <- 0
+skip.all <- 0  #only set it to 1 when  (1) neither cond1 or cond2 is  true OR (2) cost exceeds the budget .
+group.level2 <- as.factor(group.level)
+
+if(tau.v[l]>=tau){
+skip.all <- 1
+}else{
+Lambdas <- sapply(partition$Polytopes, "[[", 2)
+
+##shrink the candidate space, only choose from polytopes whose
+#  (i) Lambda>0
+#       AND
+#  (ii) obs are not from same group (the obs with known labels)
+cond1 <- (Lambdas>0)
+cond2 <- (apply(is.infinite(sapply(partition$Polytopes,"[[",3)/0),2,sum)>1)
+cond12 <- sum(cond1&cond2)
+if(cond12==0){
+skip.all <- 1
+}else{
+sample.space <- which(cond1&cond2)
+if(length(sample.space)==1){
+j <- sample.space
+}else{
+j <- sample(x=c(sample.space),size=1,prob = Lambdas[sample.space])
+}
+
+V.temp.ID <- partition$Polytopes[[j]]$V.ID
+V.temp <- V.all[V.temp.ID,]
+V.temp.label <- V.label[V.temp.ID]
+dist.max <- partition$Polytopes[[j]]$dist.max
+Cut <- Cut_plane_standard(V.temp,V.tempID,V.temp.label,sample.type,cut.type,accept.rate.min,dist.max,w.normal)
+
+if(Cut$skip.index!=1){
+index.left <- Cut$V.left.ID
+index.right <- Cut$V.right.ID
+
+if(length(index.left)==1){
+V.temp.left <- t(as.matrix(V.temp[index.left,]))
+}else{
+V.temp.left <- V.temp[index.left,]
+}
+
+if(length(index.right)==1){
+V.temp.right <- t(as.matrix(V.temp[index.right,]))
+}else{
+V.temp.right <- V.temp[index.right,]
+}
+
+V.temp.ID.left <- V.temp.ID[index.left]
+V.temp.ID.right <- V.temp.ID[index.right]
+
+cut.idx <- 1
+l <- l+1
+
+#out.left <- app_qhull(V.temp.left,d)
+#out.right <- app_qhull(V.temp.right,d)
+#Lambda.left <- out.left[1]
+#Lambda.right <- out.right[1]
+#dist.max.left <- out.left[2]
+#dist.max.right <- out.right[2]
+
+dist.max.left <- max(dist.all[V.temp.ID.left,V.temp.ID.left])
+dist.max.right <-  max(dist.all[V.temp.ID.right,V.temp.ID.right])
+Lambda.left <- dist.max.left/2
+Lambda.right <- dist.max.right/2
+
+
+
+countbygroup.left <- as.numeric(table(c(V.label[V.temp.ID.left],group.level2))-1)
+countbygroup.right <- as.numeric(table(c(V.label[V.temp.ID.right],group.level2))-1)
+partition$Polytopes[[j]] <- list(V.ID=V.temp.ID.left,Lambda=Lambda.left,CountByGroup=countbygroup.left,dist.max=dist.max.left)
+partition$Polytopes[[l]] <- list(V.ID=V.temp.ID.right,Lambda=Lambda.right,CountByGroup=countbygroup.right,dist.max=dist.max.right)
+
+
+Lambdas <- sapply(partition$Polytopes, "[[", 2)
+tau.v.plus1 <- rexp(n=1,sum(Lambdas))+tau.v[l-1]
+tau.v <- c(tau.v,tau.v.plus1)
+partition$tau <- tau.v
+}
+}
+
+}
+return(list(partition=partition,
+cut.indx=cut.idx,
+Cut=Cut,skip.all=skip.all))
+}
+
+
+
+partition_initial <- function(group.level,group.len,V.all,V.label,l.max,tau,sample.type,cut.type,accept.rate.min){
+group.level2 <- as.factor(group.level)
+n <- length(V.label)
+V.temp.ID <- c(1:n)
+V.temp <- V.all[V.temp.ID,]
+d <- dim(V.all)[2]
+Polytopes <- list()
+#countbygroup <- rep(NA,group.len)
+dist.all <- as.matrix(dist(V.all))
+
+
+
+countbygroup <- as.numeric(table(c(V.label,group.level2))-1)
+
+#out.temp <- app_qhull(V.temp,d)
+#Polytopes[[1]] <- list(V.ID=V.temp.ID,  Lambda=out.temp[1], CountByGroup=countbygroup,dist.max=out.temp[2])
+#rm("out.temp")
+dist.max <- max(dist.all)
+Polytopes[[1]] <- list(V.ID=V.temp.ID,  Lambda=dist.max/2, CountByGroup=countbygroup,dist.max=dist.max)
+
+
+Partition.Inital <- list(Polytopes=Polytopes,tau=rexp(1,rate=Polytopes[[1]]$Lambda))
+
+output <- list(Partition.Inital=Partition.Inital,dist.all=dist.all)
+return(output)
+}
+
+getmode <- function(v) {
+uniqv <- unique(v)
+uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+
+
+#----inference -----start from here--------
+
+
+
+#------------------Partition versus no. cuts (No. of cuts =l.max or tau=Inf)------------------
+alpha0 <- matrix((round(table(group)/table(group)[1],2))*ALPHA,ncol=1) #try math paramter
+t0 <- proc.time()
+table.out <- c()
+
+cat(sprintf("\nEstimated runtime: ?\n"))
+pb <- txtProgressBar(min = 0, max = N*rep.max, style = 3)
+
+set.seed(split.seed)
+
+part_init <- partition_initial(group.level,group.len,V.all,V.label,l.max,tau,sample.type,cut.type,accept.rate.min)
+
+Partition.Inital <- part_init$Partition.Inital
+dist.all <- part_init$dist.all
+
+
+Partition.t0 <- list()
+Lambda0 <- Partition.Inital$Polytopes[[1]]$Lambda
+for(i in 1:N){
+tau.temp <- rexp(1,rate=Lambda0)
+Partition.t0[[i]] <- list(Polytopes=Partition.Inital$Polytopes,tau=tau.temp)
+}
+
+cbg0 <- sapply(Partition.Inital$Polytopes, "[[", 3)
+multi.beta.0 <- apply(cbg0,2, (function(x){x+alpha0}))
+logl.tminus0 <- rep(sum(lgamma(multi.beta.0))-sum(lgamma(apply(multi.beta.0,2,sum)))-dim(cbg0)[2]*(sum(lgamma(alpha0))-lgamma(sum(alpha0))),N)
+
+Wt0 <- rep(1/N,N)   # Weights vector for N particles at time t=0
+logWt0 <- log(Wt0)   # log Weights vector for N particles at time t=0
+
+label.predict.all <- NULL
+for(rep in 1:rep.max){
+setTxtProgressBar(pb, ((rep-1)*N))
+
+Partition.t <- Partition.t0
+Wt <- Wt0        # Weights vector for N particles at time t
+logWt <- logWt0  # log Weights vector for N particles at time t
+logl.tminus1 <- logl.tminus0 #log likelihood for N particles at time t-1
+logl.t <- logl.tminus1 #log likelihood for N particles at time t
+# create progress bar
+tau.li <- Partition.Inital$tau
+
+end.cond <- FALSE
+
+skip.index.N <- rep(0,N)
+
+t <- 1  # here t is the number of cuts; we use vector tau to denote the cost at each cut.
+t.idx <- rep(0,l.max)
+while(tau.li<tau){
+Cut <- vector(mode="list",length=N)
+#resampling-------------start
+if(t>1){
+
+jC <- sample(x=1:N,size=N,prob =Wt,replace = TRUE )
+
+
+Partition.t.new <- list()
+for(i in 1:N){
+Partition.t.new[[i]] <- Partition.t[[jC[i]]]
+}
+
+
+Wt[1:N] <- 1/N
+
+
+logWt <- log(Wt)
+logl.t <- logl.t[jC]
+logl.tminus1 <- logl.tminus1[jC]
+skip.index.N <- skip.index.N[jC]
+Partition.t <- Partition.t.new
+rm("Partition.t.new")
+}
+#resampling-------------end
+
+
+for (i in 1:N){
+if(!skip.index.N[i]){
+partition.temp <- Partition.t[[i]]
+Out.temp <- Generative_Process(partition.temp,V.all,V.label,tau,group.level,group.len,sample.type,cut.type,accept.rate.min,w.normal)
+Cut[[i]] <- Out.temp$Cut
+if(Out.temp$cut.indx){
+cbg.new <- sapply(Out.temp$partition$Polytopes, "[[", 3) # count by group for the new partion
+multi.beta.a <- apply(cbg.new,2, (function(x){x+alpha0}))
+logl.t[i] <- sum(lgamma(multi.beta.a))-sum(lgamma(apply(multi.beta.a,2,sum)))-dim(cbg.new)[2]*(sum(lgamma(alpha0))-lgamma(sum(alpha0)))
+logWt[i] <- logWt[i]+logl.t[i]-logl.tminus1[i]
+logl.tminus1[i] <- logl.t[i]
+Partition.t[[i]] <- Out.temp$partition
+}else{
+skip.index.N[i] <- Out.temp$skip.all
+i.rep <- 0
+if(!skip.index.N[i]){
+while(i.rep<10){
+Out.temp <- Generative_Process(partition.temp,V.all,V.label,tau,group.level,group.len,sample.type,cut.type,accept.rate.min,w.normal)
+Cut[[i]] <- Out.temp$Cut
+i.rep <- i.rep+1
+if(Out.temp$cut.indx){
+cbg.new <- sapply(Out.temp$partition$Polytopes, "[[", 3) # count by group for the new partion
+multi.beta.a <- apply(cbg.new,2, (function(x){x+alpha0}))
+logl.t[i] <- sum(lgamma(multi.beta.a))-sum(lgamma(apply(multi.beta.a,2,sum)))-dim(cbg.new)[2]*(sum(lgamma(alpha0))-lgamma(sum(alpha0)))
+logWt[i] <- logWt[i]+logl.t[i]-logl.tminus1[i]
+logl.tminus1[i] <- logl.t[i]
+Partition.t[[i]] <- Out.temp$partition
+i.rep <- Inf
+}else{
+skip.index.N[i] <- Out.temp$skip.all
+}
+}
+}
+}
+}
+
+}
+
+
+Wt <- exp((logWt-max(logWt)))/sum(exp((logWt-max(logWt))))
+
+t <- max(length(Partition.t[[which.max(Wt)]]$tau)-1,1)
+
+tau.li <- min(map_dbl(Partition.t,~rev(.$tau)[1]))
+end.cond <- min(skip.index.N)
+
+t.idx[t] <- t.idx[t]+1
+
+# to avoid endless while-loop
+if(end.cond | (t+1)>l.max | tau.li>tau|(t.idx[t]>100) ){
+tau.li <- Inf
+}
+
+if(tau.li==Inf){
+#---correct%
+count.by.group.temp <- sapply(Partition.t[[which.max(Wt)]]$Polytopes, "[[", 3)
+count.by.group.temp.idx <- apply(count.by.group.temp,2,which.max)
+
+ID.temp <- sapply(Partition.t[[which.max(Wt)]]$Polytopes, "[[", 1)
+label.predic <- rep(NA,length(V.label))
+for(id.j in 1:length(ID.temp)){
+label.predic[ID.temp[[id.j]]] <- as.numeric(group.level[count.by.group.temp.idx[id.j]])
+}
+pred.t <- label.predic[id.test]
+label.predict.all<- cbind(label.predict.all,pred.t)
+}
+}
+
+
+if(rep==1){
+zz = round((proc.time()-t0)[3]/60/60*rep.max,4)
+if (zz < 1) {
+zz = round(zz * 60)
+if (zz <= 1) {
+zz = "1 minute"
+} else {
+zz = sprintf("%d minutes", zz)
+}
+} else if (zz > 24) {
+zz = round(zz/24)
+if (zz <= 1) {
+zz = "1 day"
+} else {
+zz = sprintf("%d days", zz)
+}
+} else {
+zz = round(zz)
+if (zz <= 1) {
+zz = "1 hour"
+} else {
+zz = sprintf("%d hours", zz)
+}
+}
+
+cat(sprintf("\r\033[K\033[1A\r\033[K\r%s\n", paste("Estimated runtime: ", zz, sep="" )))
+}
+}
+label.predict.all <- as.matrix(t(na.omit(t(label.predict.all))))
+label.predict.RF  <- apply(label.predict.all,1,getmode)
+group.test <- data.frame(Level=data$Level)
+group.test[-id.test, ] <- NaN
+group.test[id.test, ] <- label.predict.RF
+write.table(group.test, file = gname, sep = ' ', row.names = FALSE, col.names = TRUE, quote = FALSE, na = "NaN")
+cat(sprintf("\r\033[K\033[K\r\nDone.\n"))
+# proc.time()-t0
