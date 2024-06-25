@@ -286,6 +286,23 @@ div.footer {
 }
 
 
+	shadow
+{
+    display:block;
+    position:relative;
+}
+	
+.shadow:before
+{
+    display:block;
+    content:'';
+    position:absolute;
+    width:100%;
+    height:100%;
+    -moz-box-shadow:inset 0px 0px 6px 6px rgba(255,255,255,1);
+    -webkit-box-shadow:inset 0px 0px 6px 6px rgba(255,255,255,1);
+    box-shadow:inset 0px 0px 6px 6px rgba(255,255,255,1);
+}
 
 
 	div.bottom {
@@ -359,10 +376,14 @@ div.footer {
                 <a href="https://github.com/llolab/kgen">kgen</a> (by Lloyd Elliott). Efficiently compute inverses of genetic similarity matrices for partially observed multi-phenotype data.
             </li>
             <li>
-		    <div style="float: right; padding: 15px; text-align: center;">
+		    <div style="float: right; text-align: center;">
+			    <div style="background-color: #58525e;">
+			    	<div class="shadow">
 					<a href="tess19" download="tess19"> 
-						<img src="tess19.png" border=0 height=125 style="padding: 5px; background-color: #58525e;">
+						<img src="tess19.png" border=0 height=125 style="margin: 5px;">
 					</a>
+				</div>
+			    </div>
 		    </div>
 		    
                 <a href="tess19" download="tess19">tess19</a>
