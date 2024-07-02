@@ -1,0 +1,35 @@
+COVID-19:
+- 30k basepairs
+- 4 structure proteins. M E N S Nucleocapsid Spike
+
+Msemburi excess death:
+- WHO data
+- 2020 2021
+- "The difference in the total number of deaths in a crisis compared to those expected under normal conditions"
+- log linear combination of annual trend and seasonal trend
+
+COVID-19 CFR
+- Yang Cao et al. 2-3% July 2020. Karolinska Institute/UCL
+
+Parker et al.
+- Bayesian model
+-- Initial abundance
+-- Detected active cases
+-- Domestic spread
+-- Imported cases
+-- Observation process
+-- Importation independent domestic
+-- 60% - 80%
+-- 20% - 40%
+
+HIV
+-- The allele discovery is from linkage
+
+HostSeq project
+-- 40m budget, 4000/sequence
+
+Noise sources
+- Variation in study design. Add study indicator as confounder
+- Study overlap. Metasubtract
+- Population stratification
+- Phylogeography
