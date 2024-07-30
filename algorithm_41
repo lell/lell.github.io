@@ -1,3 +1,5 @@
+# Tested with Mathematica 10
+
 GeneralizedStirlingS1[A_, B_, N_, K_] :=
   Sum[
    StirlingS1[N, j] *
