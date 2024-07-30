@@ -1,0 +1,34 @@
+GeneralizedStirlingS1[A_, B_, N_, K_] :=
+  Sum[
+   StirlingS1[N, j] *
+    StirlingS2[j, K] *
+    A^(N - j) *
+    B^(j - K),
+   {j, K, N}];
+
+PADK[A_, D_, K_, N_] :=
+  D^(K - 1)*Gamma[A + 1]/Gamma[A/D + 1]*
+   Gamma[A/D + K]/Gamma[A + N]*
+   GeneralizedStirlingS1[-1, -D, N, K];
+
+NOEVENT[A_, D_, K_, N_, M_] :=
+  A*Gamma[M - D]/(
+     (A + D*(K - 1))*
+      Gamma[1 - D]*
+      Gamma[M]);
+
+PMQ[A_, D_, K_, N_, M_] :=
+  NOEVENT[A, D, K, N, M]*PADK[A + D, D, K, N - M];
+
+PM[A_, D_, N_, M_] :=
+  Sum[PMQ[A, D, k, N, M], {k, 1, N - M}];
+
+LM[A_, D_, N_, M_] :=  PM[A, D, N, M]/(1 - PM[A, D, N, M]);
+
+# Modify these lines to specify input
+a := 1.0;
+d := 0.1;
+n := 10;
+
+# Output stored in ‘Result’
+Result := Table[{m, LM[a, d, n, m]}, {m, 1, n - 1}];
